@@ -46,7 +46,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onImport }) => {
     <div>
       <h1 style={{ marginBottom: '1rem' }}>Welcome to the Map Interface</h1>
       <p style={{ marginBottom: '1rem' }}>Please upload a JSON file to build your map.</p>
-      <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', marginTop: '1rem' }}>
         <label
           style={{
             padding: '0.6em 1.2em',

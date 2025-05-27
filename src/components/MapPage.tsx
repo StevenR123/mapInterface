@@ -17,11 +17,19 @@ const MapPage: React.FC = () => {
 
   const exportMapData = () => {
     if (mapData) {
+      const dateTime = new Date().toLocaleString('en-US', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      }).replace(/\//g, '-').replace(/, /g, ':').replace(/ /g, '-'); // Format dateTime for file name
       const blob = new Blob([JSON.stringify(mapData, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'mapData.json';
+      a.download = `${mapData.map.name || 'mapData'}-${dateTime}.json`; // Append dateTime to file name
       a.click();
       URL.revokeObjectURL(url);
     }
@@ -113,6 +121,23 @@ const MapPage: React.FC = () => {
 
   return (
     <>
+      <button
+        style={{
+          position: 'absolute',
+          top: '10px',
+          right: '10px',
+          padding: '10px 20px',
+          fontSize: '16px',
+          cursor: 'pointer',
+          backgroundColor: '#646cff',
+          color: '#fff',
+          border: 'none',
+          borderRadius: '5px',
+        }}
+        onClick={() => window.location.href = '/'}
+      >
+        Back
+      </button>
       {newMarker && (
         <div
           style={{
@@ -167,7 +192,18 @@ const MapPage: React.FC = () => {
             overflow: 'hidden',
           }}
         >
-          <div className='map-header' style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', width: '100%', position: 'absolute', top: '10px', zIndex: 1000 }}>
+          <div
+            className="map-header"
+            style={{
+              display: 'flex',
+              justifyContent: 'space-around',
+              alignItems: 'center',
+              width: '100%',
+              position: 'absolute',
+              top: '10px',
+              zIndex: 1000,
+            }}
+          >
             <button
               onClick={exportMapData}
               style={{ padding: '10px 20px', fontSize: '16px', cursor: 'pointer' }}
@@ -184,7 +220,7 @@ const MapPage: React.FC = () => {
           </div>
           <MapEventHandler />
           <ImageOverlay url={map.imageUrl} bounds={map.bounds} />
-          {markers.map((marker: any) => (
+          {markers.map((marker: { id: string; position: [number, number]; label: string; description: string; icon: { imageUrl: string; size: [number, number] } }) => (
             <Marker
               key={marker.id}
               position={marker.position}
