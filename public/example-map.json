@@ -1,0 +1,29 @@
+{
+  "map": {
+    "name": "Example Map",
+    "imageUrl": "https://example.com/map-image.jpg",
+    "bounds": [[0, 0], [1000, 1000]]
+  },
+  "markers": [
+    {
+      "id": "marker-1",
+      "position": [100, 200],
+      "label": "Marker 1",
+      "description": "This is the first marker.",
+      "icon": {
+        "imageUrl": "https://example.com/marker-icon-1.png",
+        "size": [32, 32]
+      }
+    },
+    {
+      "id": "marker-2",
+      "position": [300, 400],
+      "label": "Marker 2",
+      "description": "This is the second marker.",
+      "icon": {
+        "imageUrl": "https://example.com/marker-icon-2.png",
+        "size": [48, 48]
+      }
+    }
+  ]
+}
