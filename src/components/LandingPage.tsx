@@ -9,6 +9,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onImport }) => {
   const [showContextMenu, setShowContextMenu] = useState(false);
   const [mapName, setMapName] = useState('');
   const [mapImageUrl, setMapImageUrl] = useState('');
+  const [defaultMarkerImageUrl, setDefaultMarkerImageUrl] = useState('');
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -34,6 +35,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onImport }) => {
         name: mapName,
         imageUrl: mapImageUrl,
         bounds: [[0, 0], [1, 1]],
+        defaultMarkerImageUrl: defaultMarkerImageUrl, // Added default marker image
       },
       markers: [],
     };
@@ -111,6 +113,15 @@ const LandingPage: React.FC<LandingPageProps> = ({ onImport }) => {
               type="text"
               value={mapImageUrl}
               onChange={(e) => setMapImageUrl(e.target.value)}
+              style={{ width: '100%', padding: '0.5rem', marginTop: '0.5rem' }}
+            />
+          </label>
+          <label style={{ display: 'block', marginBottom: '0.5rem' }}>
+            Map Image URL:
+            <input
+              type="text"
+              value={defaultMarkerImageUrl}
+              onChange={(e) => setDefaultMarkerImageUrl(e.target.value)}
               style={{ width: '100%', padding: '0.5rem', marginTop: '0.5rem' }}
             />
           </label>

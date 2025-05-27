@@ -53,7 +53,7 @@ const MapPage: React.FC = () => {
       label: '',
       description: '',
       icon: {
-        imageUrl: '',
+        imageUrl: mapData.map.defaultMarkerImageUrl,
         size: [40, 40],
       },
       clickPosition: {
