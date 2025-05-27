@@ -98,8 +98,11 @@ const MapPage: React.FC = () => {
   };
 
   const MapEventHandler = () => {
-    useMapEvents({
+    const map = useMapEvents({
       click: handleMapClick,
+      zoomend: () => {
+        console.log('Current zoom level:', map.getZoom()); // Log the current zoom level
+      },
     });
     return null;
   };
@@ -230,9 +233,10 @@ const MapPage: React.FC = () => {
             top: `${newMarker.clickPosition.y}px`,
             left: `${newMarker.clickPosition.x}px`,
             transform: 'translate(-50%, 100%)',
-            background: 'Black',
+            background: 'rgba(0, 0, 0, 0.5)',
             padding: '20px',
             zIndex: 1000,
+            textAlign: 'left',
           }}
         >
           <h3>New Marker Properties</h3>
