@@ -2,9 +2,15 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import LandingPage from './components/LandingPage';
 
 function App() {
   const [count, setCount] = useState(0)
+
+  const handleImport = (data: any) => {
+    console.log('Imported JSON data:', data);
+    // Logic to process the imported JSON data will go here
+  };
 
   return (
     <>
@@ -28,6 +34,7 @@ function App() {
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
+      <LandingPage onImport={handleImport} />
     </>
   )
 }
