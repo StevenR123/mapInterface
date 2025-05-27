@@ -6,6 +6,7 @@ import L from 'leaflet';
 const MapPage: React.FC = () => {
   const [mapData, setMapData] = useState<any | null>(null);
   const [newMarker, setNewMarker] = useState<any | null>(null);
+  const [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
     const storedData = localStorage.getItem('mapData');
@@ -27,6 +28,11 @@ const MapPage: React.FC = () => {
   };
 
   const handleMapClick = (event: L.LeafletMouseEvent) => {
+    if (!editMode) return; // Prevent adding a marker if editMode is false
+
+    const mapContainer = document.querySelector('.leaflet-container');
+    const mapRect = mapContainer?.getBoundingClientRect();
+
     setNewMarker({
       id: Date.now(),
       position: event.latlng,
@@ -34,7 +40,11 @@ const MapPage: React.FC = () => {
       description: '',
       icon: {
         imageUrl: '',
-        size:[40, 40],
+        size: [40, 40],
+      },
+      clickPosition: {
+        x: event.containerPoint.x + (mapRect?.left || 0),
+        y: event.containerPoint.y + (mapRect?.top || 0),
       },
     });
   };
@@ -76,11 +86,31 @@ const MapPage: React.FC = () => {
 
   return (
     <>
-      <button onClick={exportMapData} style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 1000 }}>
-        Export Map Data
-      </button>
+      <div style={{ top: '10px', transform: 'translateX(47%)', zIndex: 1000 }}>
+        <button
+          onClick={() => setEditMode((prev) => !prev)}
+          style={{ padding: '10px 20px', fontSize: '16px', cursor: 'pointer' }}
+        >
+          {editMode ? 'Edit' : 'View'}
+        </button>
+      </div>
+      {mapData && (
+        <button onClick={exportMapData} style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 1000 }}>
+          Export Map Data
+        </button>
+      )}
       {newMarker && (
-        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: 'Black', padding: '20px', zIndex: 1000 }}>
+        <div
+          style={{
+            position: 'absolute',
+            top: `${newMarker.clickPosition.y}px`,
+            left: `${newMarker.clickPosition.x}px`,
+            transform: 'translate(-50%, 100%)',
+            background: 'Black',
+            padding: '20px',
+            zIndex: 1000,
+          }}
+        >
           <h3>New Marker Properties</h3>
           <label>
             Label:
