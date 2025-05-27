@@ -70,7 +70,7 @@ const MapPage: React.FC = () => {
         label: newMarker.label || `Marker ${mapData.markers.length + 1}`,
         icon: {
           ...newMarker.icon,
-          imageUrl: newMarker.icon.imageUrl || 'https://i.imgur.com/oOvZCp8.png',
+          imageUrl: newMarker.icon.imageUrl || 'https://i.imgur.com/CRHS2ni.png',
         },
       };
 
