@@ -269,6 +269,16 @@ const MapPage: React.FC = () => {
           <br />
           <button onClick={saveMarker}>Save Marker</button>
           <button onClick={() => setNewMarker(null)}>Cancel</button>
+          <button onClick={() => {
+  setMapData((prevData: any) => {
+    if (!prevData) return prevData;
+    return {
+      ...prevData,
+      markers: prevData.markers.filter((m: any) => m.id !== newMarker.id),
+    };
+  });
+  setNewMarker(null);
+}}>Delete Marker</button>
         </div>
       )}
       <MapContainer
