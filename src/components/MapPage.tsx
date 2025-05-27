@@ -86,6 +86,8 @@ const MapPage: React.FC = () => {
   };
 
   const handleMarkerClick = (marker: { id: string; position: [number, number]; label: string; description: string; icon: { imageUrl: string; size: [number, number] } }) => {
+    if (!editMode) return; // Prevent editing a marker if editMode is false
+
     setNewMarker({
       ...marker,
       clickPosition: {
@@ -245,10 +247,12 @@ const MapPage: React.FC = () => {
                 click: () => handleMarkerClick(marker),
               }}
             >
-              <Popup>
-                <strong>{marker.label}</strong>
-                <p>{marker.description}</p>
-              </Popup>
+              {editMode ? null : (
+                <Popup>
+                  <strong>{marker.label}</strong>
+                  <p>{marker.description}</p>
+                </Popup>
+              )}
             </Marker>
           ))}
         </MapContainer>
