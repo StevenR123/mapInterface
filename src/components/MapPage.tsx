@@ -270,11 +270,12 @@ const MapPage: React.FC = () => {
       <MapContainer
         bounds={map.bounds}
         style={{
-          height: '100vh',
+          height: 'calc(100vh - 60px)', // Shorten the height to account for the top buttons
           width: '100vw',
           maxWidth: '100%',
           overflow: 'hidden',
         }}
+        attributionControl={false} // Disable the Leaflet attribution tag
       >
         <div
           className="center-map-button"
