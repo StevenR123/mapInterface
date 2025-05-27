@@ -131,40 +131,98 @@ const MapPage: React.FC = () => {
 
   const { map, markers } = mapData;
 
+  const SearchBar: React.FC<{ markers: any[] }> = ({ markers }) => {
+    const [searchQuery, setSearchQuery] = useState('');
+    const [filteredMarkers, setFilteredMarkers] = useState<any[]>([]);
+    const mapInstance = useMap();
+
+    const handleSearch = (query: string) => {
+      setSearchQuery(query);
+      const filtered = markers.filter(
+        (m: { label: string; description: string }) =>
+          m.label.toLowerCase().includes(query.toLowerCase()) ||
+          m.description.toLowerCase().includes(query.toLowerCase())
+      );
+      setFilteredMarkers(filtered);
+    };
+
+    const handleMarkerClick = (marker: { position: [number, number] }) => {
+      mapInstance.setView(marker.position, mapInstance.getZoom());
+      setFilteredMarkers([]); // Clear the dropdown after selection
+    };
+
+    return (
+      <div style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 1000 }}>
+        <input
+          type="text"
+          placeholder="Search for a marker"
+          value={searchQuery}
+          onChange={(e) => handleSearch(e.target.value)}
+          style={{ padding: '10px', fontSize: '16px', width: '200px' }}
+        />
+        {filteredMarkers.length > 0 && (
+          <ul
+            style={{
+              marginTop: '5px',
+              padding: '10px',
+              backgroundColor: '#1a1a1a', // Matches the search bar color
+              border: '1px solid #ccc',
+              borderRadius: '5px',
+              listStyleType: 'none',
+              maxHeight: '150px',
+              overflowY: 'auto',
+              color: 'white', // Ensures text is white
+            }}
+          >
+            {filteredMarkers.map((marker, index) => (
+              <li
+                key={index}
+                onClick={() => handleMarkerClick(marker)}
+                style={{ padding: '5px', cursor: 'pointer', color: 'white' }} // Ensures text is white
+              >
+                {marker.label || marker.description}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    );
+  };
+
   return (
     <>
-       <div
-            className="map-header"
-            style={{
-              display: 'flex',
-              justifyContent: 'space-evenly',
-              alignItems: 'center',
-              width: '92%',
-              maxWidth: '100%',
-              position: 'relative',
-              top: '0',
-              zIndex: 1000,
-              padding: '10px',
-            }}
+      <div
+        className="map-header"
+        style={{
+          display: 'flex',
+          justifyContent: 'space-evenly',
+          alignItems: 'center',
+          width: '92%',
+          maxWidth: '100%',
+          position: 'relative',
+          top: '0',
+          zIndex: 1000,
+          padding: '10px',
+        }}
+      >
+        <button
+          onClick={exportMapData}
+          style={{ padding: '10px 20px', fontSize: '16px', cursor: 'pointer' }}
         >
-            <button
-              onClick={exportMapData}
-              style={{ padding: '10px 20px', fontSize: '16px', cursor: 'pointer' }}
-            >
-              Export Map Data
-            </button>            
-            <button
-              onClick={() => setEditMode((prev) => !prev)}
-              style={{ padding: '10px 20px', fontSize: '16px', cursor: 'pointer' }}
-            >
-              {editMode ? 'Edit' : 'View'}
-            </button>
-            <button
-                onClick={() => window.location.href = '/'}
-            >
-                Back
-            </button>
-          </div>        
+          Export Map Data
+        </button>            
+        <button
+          onClick={() => setEditMode((prev) => !prev)}
+          style={{ padding: '10px 20px', fontSize: '16px', cursor: 'pointer' }}
+        >
+          {editMode ? 'Edit' : 'View'}
+        </button>
+        <button
+            onClick={() => window.location.href = '/'}
+        >
+            Back
+        </button>
+      </div>        
       {newMarker && (
         <div
           style={{
@@ -201,7 +259,7 @@ const MapPage: React.FC = () => {
             <input
               type="text"
               value={newMarker.icon.imageUrl}
-              onChange={(e) => setNewMarker({ ...newMarker, icon: { ...newMarker.icon, imageUrl: e.target.value } })}
+              onChange={(e) => setNewMarker({ ...newMarker.icon, imageUrl: e.target.value })}
             />
           </label>
           <br />
@@ -209,54 +267,53 @@ const MapPage: React.FC = () => {
           <button onClick={() => setNewMarker(null)}>Cancel</button>
         </div>
       )}
-      <div>
-        <MapContainer
-          bounds={map.bounds}
+      <MapContainer
+        bounds={map.bounds}
+        style={{
+          height: '100vh',
+          width: '100vw',
+          maxWidth: '100%',
+          overflow: 'hidden',
+        }}
+      >
+        <div
+          className="center-map-button"
           style={{
-            height: '100vh',
-            width: '100vw',
-            maxWidth: '100%',
-            overflow: 'hidden',
+            display: 'flex',
+            justifyContent: 'space-around',
+            alignItems: 'center',
+            width: '100%',
+            position: 'absolute',
+            top: '10px',
+            zIndex: 1000,
           }}
         >
-          <div
-            className="center-map-button"
-            style={{
-              display: 'flex',
-              justifyContent: 'space-around',
-              alignItems: 'center',
-              width: '100%',
-              position: 'absolute',
-              top: '10px',
-              zIndex: 1000,
+          <CenterMapButton mapBounds={L.latLngBounds(map.bounds)} />
+          <SearchBar markers={markers} />
+        </div>
+        <MapEventHandler />
+        <ImageOverlay url={map.imageUrl} bounds={map.bounds} />
+        {markers.map((marker: { id: string; position: [number, number]; label: string; description: string; icon: { imageUrl: string; size: [number, number] } }) => (
+          <Marker
+            key={marker.id}
+            position={marker.position}
+            icon={L.icon({
+              iconUrl: marker.icon.imageUrl || 'https://i.imgur.com/oOvZCp8.png',
+              iconSize: marker.icon.size || [40, 40],
+            })}
+            eventHandlers={{
+              click: () => handleMarkerClick(marker),
             }}
           >
-            <CenterMapButton mapBounds={L.latLngBounds(map.bounds)} />
-          </div>
-          <MapEventHandler />
-          <ImageOverlay url={map.imageUrl} bounds={map.bounds} />
-          {markers.map((marker: { id: string; position: [number, number]; label: string; description: string; icon: { imageUrl: string; size: [number, number] } }) => (
-            <Marker
-              key={marker.id}
-              position={marker.position}
-              icon={L.icon({
-                iconUrl: marker.icon.imageUrl || 'https://i.imgur.com/oOvZCp8.png',
-                iconSize: marker.icon.size || [40, 40],
-              })}
-              eventHandlers={{
-                click: () => handleMarkerClick(marker),
-              }}
-            >
-              {editMode ? null : (
-                <Popup>
-                  <strong>{marker.label}</strong>
-                  <p>{marker.description}</p>
-                </Popup>
-              )}
-            </Marker>
-          ))}
-        </MapContainer>
-      </div>
+            {editMode ? null : (
+              <Popup>
+                <strong>{marker.label}</strong>
+                <p>{marker.description}</p>
+              </Popup>
+            )}
+          </Marker>
+        ))}
+      </MapContainer>
     </>
   );
 };
