@@ -30,6 +30,12 @@ const MapPage: React.FC = () => {
   const handleMapClick = (event: L.LeafletMouseEvent) => {
     if (!editMode || (event.originalEvent.target instanceof Element && event.originalEvent.target.closest('.map-header'))) return; // Prevent adding a marker if editMode is false or the click is inside the map-header
 
+    const mapBounds = L.latLngBounds(map.bounds); // Convert map.bounds to a valid LatLngBounds object
+    const isWithinBounds = mapBounds.contains(event.latlng);
+    if (!isWithinBounds) {
+      return; // Prevent adding a marker if the click is outside the map bounds
+    } // Prevent adding a marker if the click is outside the map bounds
+
     const mapContainer = document.querySelector('.leaflet-container');
     const mapRect = mapContainer?.getBoundingClientRect();
 
