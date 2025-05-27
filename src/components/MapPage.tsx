@@ -58,7 +58,7 @@ const MapPage: React.FC = () => {
       },
       clickPosition: {
         x: event.containerPoint.x + (mapRect?.left || 0),
-        y: event.containerPoint.y + (mapRect?.top || 0),
+        y: event.containerPoint.y + (mapRect?.top || 0) - 300, // Adjust y position to align with the click
       },
     });
   };
@@ -121,23 +121,38 @@ const MapPage: React.FC = () => {
 
   return (
     <>
-      <button
-        style={{
-          position: 'absolute',
-          top: '10px',
-          right: '10px',
-          padding: '10px 20px',
-          fontSize: '16px',
-          cursor: 'pointer',
-          backgroundColor: '#646cff',
-          color: '#fff',
-          border: 'none',
-          borderRadius: '5px',
-        }}
-        onClick={() => window.location.href = '/'}
-      >
-        Back
-      </button>
+       <div
+            className="map-header"
+            style={{
+              display: 'flex',
+              justifyContent: 'space-evenly',
+              alignItems: 'center',
+              width: '92%',
+              maxWidth: '100%',
+              position: 'relative',
+              top: '0',
+              zIndex: 1000,
+              padding: '10px',
+            }}
+        >
+            <button
+              onClick={exportMapData}
+              style={{ padding: '10px 20px', fontSize: '16px', cursor: 'pointer' }}
+            >
+              Export Map Data
+            </button>            
+            <button
+              onClick={() => setEditMode((prev) => !prev)}
+              style={{ padding: '10px 20px', fontSize: '16px', cursor: 'pointer' }}
+            >
+              {editMode ? 'Edit' : 'View'}
+            </button>
+            <button
+                onClick={() => window.location.href = '/'}
+            >
+                Back
+            </button>
+          </div>        
       {newMarker && (
         <div
           style={{
@@ -193,7 +208,7 @@ const MapPage: React.FC = () => {
           }}
         >
           <div
-            className="map-header"
+            className="center-map-button"
             style={{
               display: 'flex',
               justifyContent: 'space-around',
@@ -204,19 +219,7 @@ const MapPage: React.FC = () => {
               zIndex: 1000,
             }}
           >
-            <button
-              onClick={exportMapData}
-              style={{ padding: '10px 20px', fontSize: '16px', cursor: 'pointer' }}
-            >
-              Export Map Data
-            </button>
             <CenterMapButton mapBounds={L.latLngBounds(map.bounds)} />
-            <button
-              onClick={() => setEditMode((prev) => !prev)}
-              style={{ padding: '10px 20px', fontSize: '16px', cursor: 'pointer' }}
-            >
-              {editMode ? 'Edit' : 'View'}
-            </button>
           </div>
           <MapEventHandler />
           <ImageOverlay url={map.imageUrl} bounds={map.bounds} />
