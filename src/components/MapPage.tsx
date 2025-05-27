@@ -85,6 +85,19 @@ const MapPage: React.FC = () => {
     }
   };
 
+  const handleMarkerClick = (marker: { id: string; position: [number, number]; label: string; description: string; icon: { imageUrl: string; size: [number, number] } }) => {
+    const mapContainer = document.querySelector('.leaflet-container');
+    const mapRect = mapContainer?.getBoundingClientRect();
+
+    setNewMarker({
+      ...marker,
+      clickPosition: {
+        x: marker.position[0] + (mapRect?.left || 0),
+        y: marker.position[1] + (mapRect?.top || 0), // Align directly with the marker's position
+      },
+    });
+  };
+
   const MapEventHandler = () => {
     useMapEvents({
       click: handleMapClick,
@@ -231,6 +244,9 @@ const MapPage: React.FC = () => {
                 iconUrl: marker.icon.imageUrl || 'https://i.imgur.com/oOvZCp8.png',
                 iconSize: marker.icon.size || [40, 40],
               })}
+              eventHandlers={{
+                click: () => handleMarkerClick(marker),
+              }}
             >
               <Popup>
                 <strong>{marker.label}</strong>
