@@ -86,14 +86,11 @@ const MapPage: React.FC = () => {
   };
 
   const handleMarkerClick = (marker: { id: string; position: [number, number]; label: string; description: string; icon: { imageUrl: string; size: [number, number] } }) => {
-    const mapContainer = document.querySelector('.leaflet-container');
-    const mapRect = mapContainer?.getBoundingClientRect();
-
     setNewMarker({
       ...marker,
       clickPosition: {
-        x: marker.position[0] + (mapRect?.left || 0),
-        y: marker.position[1] + (mapRect?.top || 0), // Align directly with the marker's position
+        x: window.innerWidth / 2 + window.scrollX, // Center horizontally in the current view
+        y: window.innerHeight / 2 + window.scrollY - 300, // Center vertically in the current view
       },
     });
   };
