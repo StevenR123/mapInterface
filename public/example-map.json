@@ -2,12 +2,12 @@
   "map": {
     "name": "Example Map",
     "imageUrl": "https://example.com/map-image.jpg",
-    "bounds": [[0, 0], [1000, 1000]]
+    "bounds": [[0, 0], [1, 1]]
   },
   "markers": [
     {
       "id": "marker-1",
-      "position": [100, 200],
+      "position": [0.25, 0.5],
       "label": "Marker 1",
       "description": "This is the first marker.",
       "icon": {
@@ -17,7 +17,7 @@
     },
     {
       "id": "marker-2",
-      "position": [300, 400],
+      "position": [0.75, 1],
       "label": "Marker 2",
       "description": "This is the second marker.",
       "icon": {
