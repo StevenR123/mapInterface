@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { MapContainer, ImageOverlay, Marker, Popup, useMapEvents } from 'react-leaflet';
+import { MapContainer, ImageOverlay, Marker, Popup, useMapEvents, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
@@ -28,7 +28,7 @@ const MapPage: React.FC = () => {
   };
 
   const handleMapClick = (event: L.LeafletMouseEvent) => {
-    if (!editMode) return; // Prevent adding a marker if editMode is false
+    if (!editMode || (event.originalEvent.target instanceof Element && event.originalEvent.target.closest('.map-header'))) return; // Prevent adding a marker if editMode is false or the click is inside the map-header
 
     const mapContainer = document.querySelector('.leaflet-container');
     const mapRect = mapContainer?.getBoundingClientRect();
@@ -78,6 +78,27 @@ const MapPage: React.FC = () => {
     return null;
   };
 
+  const CenterMapButton: React.FC<{ mapBounds: L.LatLngBoundsExpression }> = ({ mapBounds }) => {
+    const mapInstance = useMap();
+
+    const handleCenterMap = () => {
+      if (mapInstance && mapBounds) {
+        mapInstance.fitBounds(mapBounds);
+      } else {
+        console.error('Map instance or bounds are not available');
+      }
+    };
+
+    return (
+      <button
+        onClick={handleCenterMap}
+        style={{ padding: '10px 20px', fontSize: '16px', cursor: 'pointer' }}
+      >
+        Center Map
+      </button>
+    );
+  };
+
   if (!mapData) {
     return <div>No map data available. Please upload a JSON file.</div>;
   }
@@ -86,19 +107,6 @@ const MapPage: React.FC = () => {
 
   return (
     <>
-      <div style={{ top: '10px', transform: 'translateX(47%)', zIndex: 1000 }}>
-        <button
-          onClick={() => setEditMode((prev) => !prev)}
-          style={{ padding: '10px 20px', fontSize: '16px', cursor: 'pointer' }}
-        >
-          {editMode ? 'Edit' : 'View'}
-        </button>
-      </div>
-      {mapData && (
-        <button onClick={exportMapData} style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 1000 }}>
-          Export Map Data
-        </button>
-      )}
       {newMarker && (
         <div
           style={{
@@ -143,33 +151,50 @@ const MapPage: React.FC = () => {
           <button onClick={() => setNewMarker(null)}>Cancel</button>
         </div>
       )}
-      <MapContainer
-        bounds={map.bounds}
-        style={{
-          height: '100vh',
-          width: '100vw',
-          maxWidth: '100%',
-          overflow: 'hidden',
-        }}
-      >
-        <MapEventHandler />
-        <ImageOverlay url={map.imageUrl} bounds={map.bounds} />
-        {markers.map((marker: any) => (
-          <Marker
-            key={marker.id}
-            position={marker.position}
-            icon={L.icon({
-              iconUrl: marker.icon.imageUrl || 'https://i.imgur.com/oOvZCp8.png',
-              iconSize: marker.icon.size || [40, 40],
-            })}
-          >
-            <Popup>
-              <strong>{marker.label}</strong>
-              <p>{marker.description}</p>
-            </Popup>
-          </Marker>
-        ))}
-      </MapContainer>
+      <div>
+        <MapContainer
+          bounds={map.bounds}
+          style={{
+            height: '100vh',
+            width: '100vw',
+            maxWidth: '100%',
+            overflow: 'hidden',
+          }}
+        >
+          <div className='map-header' style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', width: '100%', position: 'absolute', top: '10px', zIndex: 1000 }}>
+            <button
+              onClick={exportMapData}
+              style={{ padding: '10px 20px', fontSize: '16px', cursor: 'pointer' }}
+            >
+              Export Map Data
+            </button>
+            <CenterMapButton mapBounds={L.latLngBounds(map.bounds)} />
+            <button
+              onClick={() => setEditMode((prev) => !prev)}
+              style={{ padding: '10px 20px', fontSize: '16px', cursor: 'pointer' }}
+            >
+              {editMode ? 'Edit' : 'View'}
+            </button>
+          </div>
+          <MapEventHandler />
+          <ImageOverlay url={map.imageUrl} bounds={map.bounds} />
+          {markers.map((marker: any) => (
+            <Marker
+              key={marker.id}
+              position={marker.position}
+              icon={L.icon({
+                iconUrl: marker.icon.imageUrl || 'https://i.imgur.com/oOvZCp8.png',
+                iconSize: marker.icon.size || [40, 40],
+              })}
+            >
+              <Popup>
+                <strong>{marker.label}</strong>
+                <p>{marker.description}</p>
+              </Popup>
+            </Marker>
+          ))}
+        </MapContainer>
+      </div>
     </>
   );
 };

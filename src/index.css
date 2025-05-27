@@ -28,6 +28,8 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  /* TODO: Find way to prevent without using overflow:hidden */
+  overflow-x: hidden; /* Hide horizontal overflow to prevent body width from exceeding the browser width */
 }
 
 h1 {
