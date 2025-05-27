@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Box, Button, Typography } from '@mui/material';
 
 interface LandingPageProps {
   onImport: (data: any) => void;
@@ -27,41 +26,36 @@ const LandingPage: React.FC<LandingPageProps> = ({ onImport }) => {
   };
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100vh',
-        backgroundColor: '#f5f5f5',
-      }}
-    >
-      <Typography variant="h4" gutterBottom>
-        Welcome to the Map Interface
-      </Typography>
-      <Typography variant="body1" gutterBottom>
-        Please upload a JSON file to build your map.
-      </Typography>
-      <Button
-        variant="contained"
-        component="label"
-        sx={{ mt: 2 }}
-      >
-        Upload JSON File
-        <input
-          type="file"
-          hidden
-          accept="application/json"
-          onChange={handleFileUpload}
-        />
-      </Button>
+    <div>
+      <h1 style={{ marginBottom: '1rem' }}>Welcome to the Map Interface</h1>
+      <p style={{ marginBottom: '1rem' }}>Please upload a JSON file to build your map.</p>
+      <div style={{ marginTop: '1rem' }}>
+        <label
+          style={{
+            padding: '0.6em 1.2em',
+            fontSize: '1em',
+            fontWeight: '500',
+            borderRadius: '8px',
+            border: '1px solid transparent',
+            backgroundColor: '#1a1a1a',
+            color: '#fff',
+            cursor: 'pointer',
+            transition: 'border-color 0.25s',
+          }}
+        >
+          Upload JSON File
+          <input
+            type="file"
+            style={{ display: 'none' }}
+            accept="application/json"
+            onChange={handleFileUpload}
+          />
+        </label>
+      </div>
       {error && (
-        <Typography color="error" sx={{ mt: 2 }}>
-          {error}
-        </Typography>
+        <p style={{ color: 'red', marginTop: '1rem' }}>{error}</p>
       )}
-    </Box>
+    </div>
   );
 };
 
