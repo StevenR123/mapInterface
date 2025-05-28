@@ -120,7 +120,8 @@ const MapPage: React.FC = () => {
       zoomend: () => {
         if (mapInstance) {
           const currentZoom = mapInstance.getZoom();
-          // console.log('Current zoom level:', currentZoom); // Log the current zoom level
+          mapData.map.currentZoom = currentZoom; // Update the current zoom level in mapData
+          console.log('Current zoom level:', mapData.map.currentZoom); // Log the current zoom level
 
           setMapData((prevData: any) => {
             if (!prevData) return prevData;
@@ -272,6 +273,7 @@ const MapPage: React.FC = () => {
       ] : [0.5, 0.5]; // Default center if bounds are invalid
 
       const initialZoom = map.bounds ? Math.max(8, Math.min(16, Math.floor(Math.log2(Math.max(map.bounds[1][0] - map.bounds[0][0], map.bounds[1][1] - map.bounds[0][1]))))) : 10; // Adjusted zoom to start 2 levels lower
+      mapData.map.currentZoom = initialZoom; // Set the initial zoom level in mapData
 
       return (
     <>
@@ -349,10 +351,10 @@ const MapPage: React.FC = () => {
           </label>
           <br />
           <label>
-            Max Zoom:
+            Max Zoom: (zoom in)
             <input
               type="number"
-              value={newMarker.maxZoom || ''}
+              value={(newMarker.maxZoom !== undefined ? newMarker.maxZoom : (mapData?.map?.currentZoom - 2)) || ''} // Default maxZoom to current zoom level + 2
               onChange={(e) => {
                 const value = e.target.value;
                 if (/^\d*$/.test(value)) {
@@ -368,10 +370,10 @@ const MapPage: React.FC = () => {
           </label>
           <br />
           <label>
-            Min Zoom:
+            Min Zoom: (zoom out)
             <input
               type="number"
-              value={newMarker.minZoom || ''}
+              value={(newMarker.minZoom !== undefined ? newMarker.minZoom : (mapData?.map?.currentZoom + 10)) || ''} // Default minZoom to 1
               onChange={(e) => {
                 const value = e.target.value;
                 if (/^\d*$/.test(value)) {
