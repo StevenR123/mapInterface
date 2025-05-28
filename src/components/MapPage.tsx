@@ -50,7 +50,7 @@ const MapPage: React.FC = () => {
   };
 
   const handleMapClick = (event: L.LeafletMouseEvent) => {
-    console.log('Map clicked at:', event.latlng);
+    // console.log('Map clicked at:', event.latlng);
     if (!editMode || (event.originalEvent.target instanceof Element && event.originalEvent.target.closest('.center-map-button'))) return; // Prevent adding a marker if editMode is false or the click is on the center map button
 
     if (!mapData?.map?.bounds) {
@@ -60,10 +60,10 @@ const MapPage: React.FC = () => {
 
     const mapBounds = L.latLngBounds(mapData.map.bounds); // Convert map.bounds to a valid LatLngBounds object
     const isWithinBounds = mapBounds.contains(event.latlng);
-    console.log('Edit mode:', editMode);
-    console.log('Event target:', event.originalEvent.target);
-    console.log('Map bounds:', mapData?.map?.bounds);
-    console.log('Is within bounds:', isWithinBounds);
+    // console.log('Edit mode:', editMode);
+    // console.log('Event target:', event.originalEvent.target);
+    // console.log('Map bounds:', mapData?.map?.bounds);
+    // console.log('Is within bounds:', isWithinBounds);
     if (!isWithinBounds) {
       return; // Prevent adding a marker if the click is outside the map bounds
     } // Prevent adding a marker if the click is outside the map bounds
@@ -90,7 +90,7 @@ const MapPage: React.FC = () => {
   };
 
   const saveMarker = () => {
-    console.log('Saving marker:'); // Log the marker details before saving
+    // console.log('Saving marker:'); // Log the marker details before saving
     if (newMarker) {
       const updatedMarker = {
         ...newMarker,
@@ -103,7 +103,7 @@ const MapPage: React.FC = () => {
         minZoom: newMarker.minZoom || null, // Add minZoom attribute
       };
 
-      console.log('New marker created:', updatedMarker); // Log the new marker details
+      // console.log('New marker created:', updatedMarker); // Log the new marker details
 
       setMapData((prevData: any) => {
         if (!prevData) return prevData;
@@ -137,7 +137,7 @@ const MapPage: React.FC = () => {
         if (mapInstance) {
           const currentZoom = mapInstance.getZoom();
           mapData.map.currentZoom = currentZoom; // Update the current zoom level in mapData
-          console.log('Current zoom level:', mapData.map.currentZoom); // Log the current zoom level
+          // console.log('Current zoom level:', mapData.map.currentZoom); // Log the current zoom level
 
           setMapData((prevData: any) => {
             if (!prevData) return prevData;
