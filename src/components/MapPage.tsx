@@ -14,6 +14,7 @@ const MapPage: React.FC = () => {
   const [newMarker, setNewMarker] = useState<any | null>(null);
   // State to toggle between edit and view modes
   const [editMode, setEditMode] = useState(false);
+  const [zoomRender, setZoomRender] = useState(false);
 
   useEffect(() => {
     // Load map data from localStorage when the component mounts
@@ -349,6 +350,15 @@ const MapPage: React.FC = () => {
         >
           {editMode ? 'Edit' : 'View'}
         </button>
+        <label style={{ marginLeft: '10px', fontSize: '16px' }}>
+          <input
+            type="checkbox"
+            checked={zoomRender}
+            onChange={(e) => setZoomRender(e.target.checked)}
+            style={{ marginRight: '5px' }}
+          />
+          Zoom Render
+        </label>
         <button
           onClick={() => window.location.href = '/'}
         >
