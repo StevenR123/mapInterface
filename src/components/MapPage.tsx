@@ -1,14 +1,22 @@
+// Importing React and necessary hooks for managing state and side effects
 import React, { useEffect, useState } from 'react';
+// Importing components and utilities from react-leaflet for map functionality
 import { MapContainer, ImageOverlay, Marker, Popup, useMapEvents, useMap } from 'react-leaflet';
+// Importing Leaflet's CSS for map styling
 import 'leaflet/dist/leaflet.css';
+// Importing Leaflet library for map-related operations
 import L from 'leaflet';
 
 const MapPage: React.FC = () => {
+  // State to store map data loaded from localStorage or other sources
   const [mapData, setMapData] = useState<any | null>(null);
+  // State to store details of a new marker being added to the map
   const [newMarker, setNewMarker] = useState<any | null>(null);
+  // State to toggle between edit and view modes
   const [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
+    // Load map data from localStorage when the component mounts
     const storedData = localStorage.getItem('mapData');
     if (storedData) {
       setMapData(JSON.parse(storedData));
@@ -17,6 +25,7 @@ const MapPage: React.FC = () => {
 
   const exportMapData = () => {
     if (mapData) {
+      // Format the current date and time for the exported file name
       const dateTime = new Date().toLocaleString('en-US', {
         year: 'numeric',
         month: '2-digit',
@@ -24,13 +33,17 @@ const MapPage: React.FC = () => {
         hour: '2-digit',
         minute: '2-digit',
         hour12: false
-      }).replace(/\//g, '-').replace(/, /g, ':').replace(/ /g, '-'); // Format dateTime for file name
+      }).replace(/\//g, '-').replace(/, /g, ':').replace(/ /g, '-');
+      // Create a Blob object containing the map data in JSON format
       const blob = new Blob([JSON.stringify(mapData, null, 2)], { type: 'application/json' });
+      // Generate a URL for the Blob object
       const url = URL.createObjectURL(blob);
+      // Create a temporary anchor element to trigger the download
       const a = document.createElement('a');
       a.href = url;
       a.download = `${mapData.map.name || 'mapData'}-${dateTime}.json`; // Append dateTime to file name
       a.click();
+      // Revoke the Blob URL to free up memory
       URL.revokeObjectURL(url);
     }
   };

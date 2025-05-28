@@ -1,34 +1,50 @@
+// Importing React and useState hook for managing component state
 import React, { useState } from 'react';
 
+// Defining the props interface for the LandingPage component
 interface LandingPageProps {
   onImport: (data: any) => void;
 }
 
+// Creating the LandingPage component
 const LandingPage: React.FC<LandingPageProps> = ({ onImport }) => {
+  // State for managing error messages
   const [error, setError] = useState<string | null>(null);
+  // State for toggling the context menu visibility
   const [showContextMenu, setShowContextMenu] = useState(false);
+  // State for storing the map name
   const [mapName, setMapName] = useState('');
+  // State for storing the map image URL
   const [mapImageUrl, setMapImageUrl] = useState('');
+  // State for storing the default marker image URL
   const [defaultMarkerImageUrl, setDefaultMarkerImageUrl] = useState('');
 
+  // Function to handle file upload and parse JSON data
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
         try {
+          // Parsing the uploaded JSON file
           const jsonData = JSON.parse(e.target?.result as string);
+          // Storing the parsed data in localStorage
           localStorage.setItem('mapData', JSON.stringify(jsonData));
+          // Passing the parsed data to the parent component
           onImport(jsonData);
+          // Clearing any previous error messages
           setError(null);
         } catch (err) {
+          // Setting an error message if the file is invalid
           setError('Invalid JSON file. Please upload a valid file.');
         }
       };
+      // Reading the file as text
       reader.readAsText(file);
     }
   };
 
+  // Function to create a new map with default properties
   const handleCreateMap = () => {
     const newMapData = {
       map: {
@@ -39,8 +55,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ onImport }) => {
       },
       markers: [],
     };
+    // Storing the new map data in localStorage
     localStorage.setItem('mapData', JSON.stringify(newMapData));
+    // Passing the new map data to the parent component
     onImport(newMapData);
+    // Hiding the context menu
     setShowContextMenu(false);
   };
 
