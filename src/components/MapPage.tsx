@@ -83,6 +83,8 @@ const MapPage: React.FC = () => {
           ...newMarker.icon,
           imageUrl: newMarker.icon.imageUrl || 'https://i.imgur.com/CRHS2ni.png',
         },
+        maxZoom: newMarker.maxZoom || null, // Add maxZoom attribute
+        minZoom: newMarker.minZoom || null, // Add minZoom attribute
       };
 
       console.log('New marker created:', updatedMarker); // Log the new marker details
@@ -98,7 +100,7 @@ const MapPage: React.FC = () => {
     }
   };
 
-  const handleMarkerClick = (marker: { id: string; position: [number, number]; label: string; description: string; icon: { imageUrl: string; size: [number, number] } }) => {
+  const handleMarkerClick = (marker: { id: string; position: [number, number]; label: string; description: string; icon: { imageUrl: string; size: [number, number] }, maxZoom?: number, minZoom?: number }) => {
     if (!editMode) return; // Prevent editing a marker if editMode is false
 
     setNewMarker({
@@ -117,7 +119,19 @@ const MapPage: React.FC = () => {
       click: handleMapClick,
       zoomend: () => {
         if (mapInstance) {
-          console.log('Current zoom level:', mapInstance.getZoom()); // Log the current zoom level
+          const currentZoom = mapInstance.getZoom();
+          // console.log('Current zoom level:', currentZoom); // Log the current zoom level
+
+          setMapData((prevData: any) => {
+            if (!prevData) return prevData;
+            return {
+              ...prevData,
+              markers: prevData.markers.map((marker: any) => ({
+                ...marker,
+                visible: (!marker.maxZoom || currentZoom <= marker.maxZoom) && (!marker.minZoom || currentZoom >= marker.minZoom),
+              })),
+            };
+          });
         } else {
           console.error('Map instance is not available');
         }
@@ -334,6 +348,44 @@ const MapPage: React.FC = () => {
             />
           </label>
           <br />
+          <label>
+            Max Zoom:
+            <input
+              type="number"
+              value={newMarker.maxZoom || ''}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (/^\d*$/.test(value)) {
+                  setNewMarker({ ...newMarker, maxZoom: value ? parseInt(value, 10) : null });
+                }
+              }}
+              onKeyPress={(e) => {
+                if (!/\d/.test(e.key)) {
+                  e.preventDefault();
+                }
+              }}
+            />
+          </label>
+          <br />
+          <label>
+            Min Zoom:
+            <input
+              type="number"
+              value={newMarker.minZoom || ''}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (/^\d*$/.test(value)) {
+                  setNewMarker({ ...newMarker, minZoom: value ? parseInt(value, 10) : null });
+                }
+              }}
+              onKeyPress={(e) => {
+                if (!/\d/.test(e.key)) {
+                  e.preventDefault();
+                }
+              }}
+            />
+          </label>
+          <br />
           <button onClick={saveMarker}>Save Marker</button>
           <button onClick={() => setNewMarker(null)}>Cancel</button>
           <button onClick={() => {
@@ -396,7 +448,7 @@ const MapPage: React.FC = () => {
     return [[0, 0], [1, 1]]; // Fallback to square if dimensions are invalid
   })()}
         />
-        {markers.map((marker: { id: string; position: [number, number]; label: string; description: string; icon: { imageUrl: string; size: [number, number] } }) => (
+        {markers.filter((marker: any) => marker.visible !== false).map((marker: { id: string; position: [number, number]; label: string; description: string; icon: { imageUrl: string; size: [number, number] }, maxZoom?: number, minZoom?: number }) => (
           <Marker
             key={marker.id}
             position={marker.position}
