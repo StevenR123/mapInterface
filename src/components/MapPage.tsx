@@ -252,7 +252,14 @@ const MapPage: React.FC = () => {
 
   const { map, markers } = mapData;
 
-  return (
+  const center: [number, number] = map.bounds ? [
+        (map.bounds[0][0] + map.bounds[1][0]) / 2,
+        (map.bounds[0][1] + map.bounds[1][1]) / 2
+      ] : [0.5, 0.5]; // Default center if bounds are invalid
+
+      const initialZoom = map.bounds ? Math.max(8, Math.min(16, Math.floor(Math.log2(Math.max(map.bounds[1][0] - map.bounds[0][0], map.bounds[1][1] - map.bounds[0][1]))))) : 10; // Adjusted zoom to start 2 levels lower
+
+      return (
     <>
       <div
         className="map-header"
@@ -343,6 +350,8 @@ const MapPage: React.FC = () => {
       )}
       <MapContainer
         bounds={map.bounds}
+        center={center}
+        zoom={initialZoom}
         style={{
           height: 'calc(100vh - 60px)', // Shorten the height to account for the top buttons
           width: '100vw',
