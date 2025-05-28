@@ -36,10 +36,20 @@ const MapPage: React.FC = () => {
   };
 
   const handleMapClick = (event: L.LeafletMouseEvent) => {
+    console.log('Map clicked at:', event.latlng);
     if (!editMode || (event.originalEvent.target instanceof Element && event.originalEvent.target.closest('.center-map-button'))) return; // Prevent adding a marker if editMode is false or the click is on the center map button
 
-    const mapBounds = L.latLngBounds(map.bounds); // Convert map.bounds to a valid LatLngBounds object
+    if (!mapData?.map?.bounds) {
+      console.error('Map bounds are not defined');
+      return;
+    }
+
+    const mapBounds = L.latLngBounds(mapData.map.bounds); // Convert map.bounds to a valid LatLngBounds object
     const isWithinBounds = mapBounds.contains(event.latlng);
+    console.log('Edit mode:', editMode);
+    console.log('Event target:', event.originalEvent.target);
+    console.log('Map bounds:', mapData?.map?.bounds);
+    console.log('Is within bounds:', isWithinBounds);
     if (!isWithinBounds) {
       return; // Prevent adding a marker if the click is outside the map bounds
     } // Prevent adding a marker if the click is outside the map bounds
@@ -64,6 +74,7 @@ const MapPage: React.FC = () => {
   };
 
   const saveMarker = () => {
+    console.log('Saving marker:'); // Log the marker details before saving
     if (newMarker) {
       const updatedMarker = {
         ...newMarker,
@@ -73,6 +84,8 @@ const MapPage: React.FC = () => {
           imageUrl: newMarker.icon.imageUrl || 'https://i.imgur.com/CRHS2ni.png',
         },
       };
+
+      console.log('New marker created:', updatedMarker); // Log the new marker details
 
       setMapData((prevData: any) => {
         if (!prevData) return prevData;
@@ -209,12 +222,24 @@ const MapPage: React.FC = () => {
       img.onload = () => {
         const imageWidth = img.naturalWidth;
         const imageHeight = img.naturalHeight;
+
+        let height = imageHeight;
+        let width = imageWidth;
+
+        while (height > 10 || width > 10) {
+          height /= 2;
+          width /= 2;
+        }
+
+        const bounds: L.LatLngBoundsLiteral = [[0, 0], [height, width]];
+
         setMapData((prevData: any) => ({
           ...prevData,
           map: {
             ...prevData.map,
             imageWidth,
             imageHeight,
+            bounds,
           },
         }));
       };
@@ -345,7 +370,7 @@ const MapPage: React.FC = () => {
         <ImageOverlay
   url={map.imageUrl}
   bounds={(() => {
-    console.log('map:', map.imageHeight, map.imageWidth); // Log the image dimensions
+    // console.log('map:', map.imageHeight, map.imageWidth); // Log the image dimensions
     if (map.imageHeight && map.imageWidth && map.imageHeight > 0 && map.imageWidth > 0) {
       let height = map.imageHeight;
       let width = map.imageWidth;
@@ -355,7 +380,7 @@ const MapPage: React.FC = () => {
         width /= 2;
       }
 
-      console.log('Adjusted bounds:', height, width); // Log the adjusted bounds
+    //   console.log('Adjusted bounds:', height, width); // Log the adjusted bounds
 
       return [[0, 0], [height, width]];
     }
