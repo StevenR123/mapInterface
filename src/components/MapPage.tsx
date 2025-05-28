@@ -203,8 +203,14 @@ const MapPage: React.FC = () => {
       setFilteredMarkers(filtered);
     };
 
-    const handleMarkerClick = (marker: { position: [number, number] }) => {
-      mapInstance.setView(marker.position, mapInstance.getZoom());
+    const handleMarkerClick = (marker: { position: [number, number], minZoom: number, maxZoom: number }) => {
+      // console.log('Marker clicked:', marker); // Log the marker details
+      const newZoomLevel = marker.minZoom && marker.maxZoom
+        ? Math.floor((marker.minZoom + marker.maxZoom) / 2)
+        : mapData?.map?.currentZoom;
+
+      // console.log('newZoomLevel:', newZoomLevel); // Log the new zoom level
+      mapInstance.setView(marker.position, newZoomLevel);
       setFilteredMarkers([]); // Clear the dropdown after selection
     };
 
