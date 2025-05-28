@@ -98,23 +98,39 @@ const MapPage: React.FC = () => {
   };
 
   const MapEventHandler = () => {
-    const map = useMapEvents({
+    const mapInstance = useMap();
+
+    useMapEvents({
       click: handleMapClick,
       zoomend: () => {
-        console.log('Current zoom level:', map.getZoom()); // Log the current zoom level
+        if (mapInstance) {
+          console.log('Current zoom level:', mapInstance.getZoom()); // Log the current zoom level
+        } else {
+          console.error('Map instance is not available');
+        }
       },
     });
+
     return null;
   };
 
-  const CenterMapButton: React.FC<{ mapBounds: L.LatLngBoundsExpression }> = ({ mapBounds }) => {
+  const CenterMapButton: React.FC = () => {
     const mapInstance = useMap();
 
     const handleCenterMap = () => {
-      if (mapInstance && mapBounds) {
-        mapInstance.fitBounds(mapBounds);
+      if (mapInstance && mapData?.map?.imageHeight && mapData?.map?.imageWidth) {
+        let height = mapData.map.imageHeight;
+        let width = mapData.map.imageWidth;
+
+        while (height > 10 || width > 10) {
+          height /= 2;
+          width /= 2;
+        }
+
+        const bounds: L.LatLngBoundsLiteral = [[0, 0], [height, width]];
+        mapInstance.fitBounds(bounds);
       } else {
-        console.error('Map instance or bounds are not available');
+        console.error('Map instance or dimensions are not available');
       }
     };
 
@@ -127,12 +143,6 @@ const MapPage: React.FC = () => {
       </button>
     );
   };
-
-  if (!mapData) {
-    return <div>No map data available. Please upload a JSON file.</div>;
-  }
-
-  const { map, markers } = mapData;
 
   const SearchBar: React.FC<{ markers: any[] }> = ({ markers }) => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -192,6 +202,31 @@ const MapPage: React.FC = () => {
     );
   };
 
+  useEffect(() => {
+    if (mapData?.map?.imageUrl) {
+      const img = new Image();
+      img.src = mapData.map.imageUrl;
+      img.onload = () => {
+        const imageWidth = img.naturalWidth;
+        const imageHeight = img.naturalHeight;
+        setMapData((prevData: any) => ({
+          ...prevData,
+          map: {
+            ...prevData.map,
+            imageWidth,
+            imageHeight,
+          },
+        }));
+      };
+    }
+  }, [mapData?.map?.imageUrl]);
+
+  if (!mapData) {
+    return <div>No map data available. Please upload a JSON file.</div>;
+  }
+
+  const { map, markers } = mapData;
+
   return (
     <>
       <div
@@ -213,7 +248,7 @@ const MapPage: React.FC = () => {
           style={{ padding: '10px 20px', fontSize: '16px', cursor: 'pointer' }}
         >
           Export Map Data
-        </button>            
+        </button>
         <button
           onClick={() => setEditMode((prev) => !prev)}
           style={{ padding: '10px 20px', fontSize: '16px', cursor: 'pointer' }}
@@ -221,11 +256,11 @@ const MapPage: React.FC = () => {
           {editMode ? 'Edit' : 'View'}
         </button>
         <button
-            onClick={() => window.location.href = '/'}
+          onClick={() => window.location.href = '/'}
         >
-            Back
+          Back
         </button>
-      </div>        
+      </div>
       {newMarker && (
         <div
           style={{
@@ -303,11 +338,30 @@ const MapPage: React.FC = () => {
             zIndex: 1000,
           }}
         >
-          <CenterMapButton mapBounds={L.latLngBounds(map.bounds)} />
+          <CenterMapButton />
           <SearchBar markers={markers} />
         </div>
         <MapEventHandler />
-        <ImageOverlay url={map.imageUrl} bounds={map.bounds} />
+        <ImageOverlay
+  url={map.imageUrl}
+  bounds={(() => {
+    console.log('map:', map.imageHeight, map.imageWidth); // Log the image dimensions
+    if (map.imageHeight && map.imageWidth && map.imageHeight > 0 && map.imageWidth > 0) {
+      let height = map.imageHeight;
+      let width = map.imageWidth;
+
+      while (height > 10 || width > 10) {
+        height /= 2;
+        width /= 2;
+      }
+
+      console.log('Adjusted bounds:', height, width); // Log the adjusted bounds
+
+      return [[0, 0], [height, width]];
+    }
+    return [[0, 0], [1, 1]]; // Fallback to square if dimensions are invalid
+  })()}
+        />
         {markers.map((marker: { id: string; position: [number, number]; label: string; description: string; icon: { imageUrl: string; size: [number, number] } }) => (
           <Marker
             key={marker.id}
