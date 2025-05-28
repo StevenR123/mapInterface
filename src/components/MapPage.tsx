@@ -208,7 +208,7 @@ const MapPage: React.FC = () => {
     };
 
     return (
-      <div style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 1000 }}>
+      <div style={{ position: 'absolute', right: '10px', zIndex: 1000 }}>
         <input
           type="text"
           placeholder="Search for a marker"
@@ -241,6 +241,37 @@ const MapPage: React.FC = () => {
             ))}
           </ul>
         )}
+      </div>
+    );
+  };
+
+  const ZoomLevelDisplay: React.FC = () => {
+    const mapInstance = useMap();
+    const [zoomLevel, setZoomLevel] = useState(mapInstance.getZoom());
+
+    useEffect(() => {
+      const updateZoomLevel = () => setZoomLevel(mapInstance.getZoom());
+      mapInstance.on('zoomend', updateZoomLevel);
+      return () => {
+        mapInstance.off('zoomend', updateZoomLevel);
+      };
+    }, [mapInstance]);
+
+    return (
+      <div
+        style={{
+          position: 'absolute',
+          top: '68px',
+          left: '13px', // Changed from right to left
+          zIndex: 1000,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          color: 'white',
+          padding: '5px 10px',
+          borderRadius: '5px',
+          fontSize: '14px',
+        }}
+      >
+        {zoomLevel}
       </div>
     );
   };
@@ -441,6 +472,7 @@ const MapPage: React.FC = () => {
             zIndex: 1000,
           }}
         >
+          <ZoomLevelDisplay />
           <CenterMapButton />
           <SearchBar markers={markers} />
         </div>
