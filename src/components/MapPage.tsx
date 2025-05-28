@@ -79,6 +79,8 @@ const MapPage: React.FC = () => {
         imageUrl: mapData.map.defaultMarkerImageUrl,
         size: [40, 40],
       },
+      maxZoom: mapData?.map?.currentZoom + 2 || null, // Default maxZoom to current zoom level + 2 or 16
+      minZoom: mapData?.map?.currentZoom - 2 || null, // Default minZoom to current zoom level - 2 or 8
       clickPosition: {
         x: event.containerPoint.x + (mapRect?.left || 0),
         y: event.containerPoint.y + (mapRect?.top || 0) - 300, // Adjust y position to align with the click
@@ -322,7 +324,7 @@ const MapPage: React.FC = () => {
           Back
         </button>
       </div>
-      {newMarker && (
+      {newMarker && newMarker.clickPosition && (
         <div
           style={{
             position: 'absolute',
@@ -367,7 +369,7 @@ const MapPage: React.FC = () => {
             Max Zoom: (zoom in)
             <input
               type="number"
-              value={(newMarker.maxZoom !== undefined ? newMarker.maxZoom : (mapData?.map?.currentZoom - 2)) || ''} // Default maxZoom to current zoom level + 2
+              value={(newMarker.maxZoom !== undefined ? newMarker.maxZoom : (mapData?.map?.currentZoom + 2)) || ''} // Default maxZoom to current zoom level + 2
               onChange={(e) => {
                 const value = e.target.value;
                 if (/^\d*$/.test(value)) {
@@ -386,7 +388,7 @@ const MapPage: React.FC = () => {
             Min Zoom: (zoom out)
             <input
               type="number"
-              value={(newMarker.minZoom !== undefined ? newMarker.minZoom : (mapData?.map?.currentZoom + 10)) || ''} // Default minZoom to 1
+              value={(newMarker.minZoom !== undefined ? newMarker.minZoom : (mapData?.map?.currentZoom - 2)) || ''} // Default minZoom to 1
               onChange={(e) => {
                 const value = e.target.value;
                 if (/^\d*$/.test(value)) {
@@ -463,9 +465,9 @@ const MapPage: React.FC = () => {
     return [[0, 0], [1, 1]]; // Fallback to square if dimensions are invalid
   })()}
         />
-        {markers.filter((marker: any) => marker.visible !== false).map((marker: { id: string; position: [number, number]; label: string; description: string; icon: { imageUrl: string; size: [number, number] }, maxZoom?: number, minZoom?: number }) => (
+        {markers.filter((marker: any) => marker.visible !== false).map((marker: any, index: number) => (
           <Marker
-            key={marker.id}
+            key={`${marker.id}-${index}`}
             position={marker.position}
             icon={L.icon({
               iconUrl: marker.icon.imageUrl || 'https://i.imgur.com/oOvZCp8.png',
