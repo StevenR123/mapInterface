@@ -52,3 +52,13 @@ export default tseslint.config({
   },
 })
 ```
+
+# Map Interface Application
+
+This application is a React-based interactive map built with TypeScript and Vite. It allows users to:
+
+- Add, edit, and delete markers on a map.
+- Search for markers using a search bar and navigate to them.
+- Export/Import map data to a JSON file.
+
+The app uses Leaflet for map rendering and provides a user-friendly interface for managing map markers and their properties.
